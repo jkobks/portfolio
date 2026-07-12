@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jakob Kessler</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fg:#F2EFE9;
+    --fg-dim:rgba(242,239,233,0.65);
+    --fg-faint:rgba(242,239,233,0.38);
+    --glass:rgba(255,255,255,0.05);
+    --glass-line:rgba(255,255,255,0.13);
+    --display:'Space Grotesk', system-ui, sans-serif;
+    --body:'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:#07090D;
+    color:var(--fg);
+    font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--fg); color:#07090D;}
+  :focus-visible{outline:2px solid #4ADECF; outline-offset:3px; border-radius:6px;}
+
+  #c{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    display:block;
+    cursor:crosshair;
+  }
+
+  main{position:relative; z-index:1; pointer-events:none;}
+  main button, main .chip{pointer-events:auto;}
+
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:24px 32px;
+    pointer-events:none;
+  }
+  .nav-mark{font-family:var(--display); font-weight:600; font-size:14px; letter-spacing:0.04em;}
+  .nav-cue{
+    font-family:var(--display); font-size:11px; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--fg-faint);
+  }
+
+  .hero{
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .panel{
+    text-align:center;
+    border-radius:22px;
+    background:var(--glass);
+    border:1px solid var(--glass-line);
+    backdrop-filter:blur(14px) saturate(130%);
+    -webkit-backdrop-filter:blur(14px) saturate(130%);
+  }
+  .hero .panel{padding:48px 44px; max-width:520px;}
+
+  h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(30px, 6vw, 50px);
+    letter-spacing:-0.02em;
+    line-height:1.05;
+    margin:0 0 12px;
+  }
+  .role{
+    font-family:var(--display);
+    font-size:13.5px;
+    letter-spacing:0.06em;
+    color:var(--fg-dim);
+  }
+  .hint{
+    margin-top:24px;
+    font-size:11.5px;
+    color:var(--fg-faint);
+    letter-spacing:0.04em;
+  }
+
+  section{padding:100px 24px; display:flex; justify-content:center;}
+  .stack-panel{padding:38px 34px; max-width:620px; width:100%;}
+  .eyebrow{
+    font-family:var(--display); font-size:11px; letter-spacing:0.15em;
+    text-transform:uppercase; color:var(--fg-faint); margin-bottom:20px;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:9px; justify-content:center;}
+  .chip{
+    font-family:var(--display);
+    font-size:13px;
+    padding:7px 15px;
+    border-radius:999px;
+    border:1px solid var(--glass-line);
+    color:var(--fg-dim);
+    transition:color .2s, border-color .2s, transform .2s;
+  }
+  .chip:hover{color:var(--fg); border-color:#4ADECF; transform:translateY(-2px);}
+
+  .contact{padding:110px 24px 150px;}
+  .contact .panel{padding:48px 38px; max-width:480px; width:100%;}
+  .magnet-btn{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(17px, 4vw, 23px);
+    padding:17px 30px;
+    border-radius:999px;
+    background:var(--fg);
+    color:#07090D;
+    border:none;
+    cursor:pointer;
+    transition:transform .15s ease, background .2s ease;
+  }
+  .magnet-btn:hover{background:#4ADECF;}
+  .contact-sub{margin-top:20px; font-size:12px; color:var(--fg-faint);}
+
+  .toast{
+    position:fixed;
+    bottom:32px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--fg); color:#07090D;
+    font-family:var(--display); font-size:13px; font-weight:600;
+    padding:11px 20px; border-radius:999px;
+    opacity:0; transition:opacity .2s, transform .2s;
+    pointer-events:none; z-index:300;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<nav>
+  <span class="nav-mark">JK</span>
+  <span class="nav-cue">Move · Click</span>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="panel">
+      <h1>Jakob Kessler</h1>
+      <div class="role">Full-Stack Developer · Munich</div>
+      <div class="hint">move your cursor · click to disturb the field</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="panel stack-panel">
+      <div class="eyebrow">Toolkit</div>
+      <div class="chips">
+        <span class="chip">React</span>
+        <span class="chip">Next.js</span>
+        <span class="chip">TypeScript</span>
+        <span class="chip">Node.js</span>
+        <span class="chip">Tailwind</span>
+        <span class="chip">Docker</span>
+        <span class="chip">Python</span>
+        <span class="chip">SQL</span>
+        <span class="chip">Canvas / Creative Coding</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="panel">
+      <div class="eyebrow">Say hello</div>
+      <button class="magnet-btn" id="magnetBtn">jakob98@icloud.com</button>
+      <div class="contact-sub">Available from October 2026</div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast">Copied ✓</div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var W = 0, H = 0, dpr = 1;
+  var particles = [];
+  var time = 0;
+
+  var mouse = { x: -9999, y: -9999, active: false };
+  var shockwaves = [];
+
+  var palette = [
+    [74, 222, 207],
+    [126, 140, 255],
+    [255, 138, 92],
+    [186, 120, 255]
+  ];
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#07090D';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function randomizeParticle(p){
+    p.x = Math.random() * W;
+    p.y = Math.random() * H;
+    p.vx = 0;
+    p.vy = 0;
+    p.life = 0;
+    p.maxLife = 180 + Math.random() * 220;
+    p.col = palette[Math.floor(Math.random() * palette.length)];
+    p.w = 0.5 + Math.random() * 1.2;
+    return p;
+  }
+
+  function initParticles(){
+    particles = [];
+    var n = W < 700 ? 700 : 1500;
+    for (var i = 0; i < n; i++){
+      var p = randomizeParticle({});
+      p.life = Math.random() * p.maxLife;
+      particles.push(p);
+    }
+  }
+
+  function fieldAngle(x, y, t){
+    var s = 0.0016;
+    var a = Math.sin(x * s + t * 0.25)
+          + Math.sin(y * s * 1.35 - t * 0.18)
+          + Math.sin((x + y) * s * 0.6 + t * 0.12)
+          + Math.sin(Math.sqrt(x * x + y * y) * s * 0.5 - t * 0.2);
+    return a * 1.1;
+  }
+
+  var MOUSE_RADIUS = 220;
+  var MOUSE_FORCE = 4.5;
+
+  function step(){
+    time += 0.01;
+
+    ctx.fillStyle = 'rgba(7, 9, 13, 0.06)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (var s = shockwaves.length - 1; s >= 0; s--){
+      shockwaves[s].r += 11;
+      shockwaves[s].strength *= 0.958;
+      if (shockwaves[s].strength < 0.02) shockwaves.splice(s, 1);
+    }
+
+    for (var i = 0; i < particles.length; i++){
+      var p = particles[i];
+
+      var ang = fieldAngle(p.x, p.y, time);
+      var fx = Math.cos(ang) * 0.42;
+      var fy = Math.sin(ang) * 0.42;
+
+      if (mouse.active){
+        var dx = p.x - mouse.x;
+        var dy = p.y - mouse.y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < MOUSE_RADIUS && d > 0.5){
+          var force = (1 - d / MOUSE_RADIUS);
+          force = force * force * MOUSE_FORCE;
+          fx += (dx / d) * force;
+          fy += (dy / d) * force;
+        }
+      }
+
+      for (var k = 0; k < shockwaves.length; k++){
+        var sw = shockwaves[k];
+        var sdx = p.x - sw.x;
+        var sdy = p.y - sw.y;
+        var sd = Math.sqrt(sdx * sdx + sdy * sdy) + 0.001;
+        var ring = Math.abs(sd - sw.r);
+        if (ring < 100){
+          var push = (1 - ring / 100) * sw.strength * 5.0;
+          fx += (sdx / sd) * push;
+          fy += (sdy / sd) * push;
+        }
+      }
+
+      p.vx = p.vx * 0.87 + fx;
+      p.vy = p.vy * 0.87 + fy;
+
+      var px = p.x, py = p.y;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life++;
+
+      var fade = 1 - (p.life / p.maxLife);
+      if (fade < 0) fade = 0;
+      var alpha = (0.55 * fade).toFixed(3);
+
+      ctx.strokeStyle = 'rgba(' + p.col[0] + ',' + p.col[1] + ',' + p.col[2] + ',' + alpha + ')';
+      ctx.lineWidth = p.w;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+
+      if (p.life > p.maxLife || p.x < -60 || p.x > W + 60 || p.y < -60 || p.y > H + 60){
+        randomizeParticle(p);
+      }
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+
+    requestAnimationFrame(step);
+  }
+
+  function setMouse(x, y){
+    mouse.x = x;
+    mouse.y = y;
+    mouse.active = true;
+  }
+
+  window.addEventListener('resize', function(){
+    resize();
+    initParticles();
+  });
+
+  document.addEventListener('mousemove', function(e){
+    setMouse(e.clientX, e.clientY);
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', function(){
+    mouse.active = false;
+  });
+
+  document.addEventListener('touchmove', function(e){
+    if (e.touches && e.touches[0]){
+      setMouse(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(){
+    mouse.active = false;
+  });
+
+  function addShock(x, y){
+    shockwaves.push({ x: x, y: y, r: 0, strength: 1 });
+    if (shockwaves.length > 6) shockwaves.shift();
+  }
+
+  document.addEventListener('mousedown', function(e){
+    addShock(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('touchstart', function(e){
+    if (e.touches && e.touches[0]){
+      addShock(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  resize();
+  initParticles();
+  requestAnimationFrame(step);
+
+  var btn = document.getElementById('magnetBtn');
+  var toast = document.getElementById('toast');
+
+  if (!reduceMotion){
+    document.addEventListener('mousemove', function(e){
+      var r = btn.getBoundingClientRect();
+      var cx = r.left + r.width / 2;
+      var cy = r.top + r.height / 2;
+      var dx = e.clientX - cx;
+      var dy = e.clientY - cy;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 150){
+        var pull = (1 - dist / 150) * 0.25;
+        btn.style.transform = 'translate(' + (dx * pull) + 'px,' + (dy * pull) + 'px)';
+      } else {
+        btn.style.transform = 'translate(0,0)';
+      }
+    }, { passive: true });
+  }
+
+  btn.addEventListener('click', function(){
+    if (navigator.clipboard){
+      navigator.clipboard.writeText('jakob98@icloud.com').then(function(){
+        toast.classList.add('show');
+        setTimeout(function(){ toast.classList.remove('show'); }, 1700);
+      });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
