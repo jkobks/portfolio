@@ -40,16 +40,6 @@
     cursor:pointer;
   }
 
-  .marble-canvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-    display:block;
-    pointer-events:none;
-  }
-
   main{position:relative; z-index:1; pointer-events:none; height:100vh; overflow:hidden;}
 
   nav{
@@ -110,17 +100,20 @@
 
   section{padding:100px 24px; display:flex; justify-content:center;}
 
-  .station{
+  .project-panel{
     position:fixed;
-    top:0; left:0;
-    z-index:2;
-    transform:translate(-50%, -50%);
+    top:50%; right:6vw;
+    z-index:6;
+    transform:translateY(-50%) translateX(30px);
     opacity:0;
     pointer-events:none;
-    transition:opacity .2s ease;
-    will-change:transform, opacity;
+    transition:opacity .6s ease, transform .6s ease;
   }
-  .station.visible{pointer-events:auto;}
+  .project-panel.visible{
+    opacity:1;
+    transform:translateY(-50%) translateX(0);
+    pointer-events:auto;
+  }
 
   .station-panel{
     text-align:center;
@@ -827,12 +820,11 @@
 
   var W = 0, H = 0, dpr = 1;
   var balls = [];
-  var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  var GRAVITY = 0.6;
+  var GRAVITY = 0.07;
   var DAMPING = 0.74;
-  var MAX_BALLS = 16;
-  var SPAWN_INTERVAL = 55; // frames
+  var MAX_BALLS = 28;
+  var SPAWN_INTERVAL = 30; // frames
   var spawnTimer = 0;
 
   function clamp(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
@@ -858,7 +850,8 @@
       vx: rand(-1.2, 1.2),
       vy: rand(0, 2),
       r: r,
-      restTime: 0
+      restTime: 0,
+      hovering: false
     });
   }
 
@@ -871,7 +864,7 @@
 
     for (var i = balls.length - 1; i >= 0; i--){
       var b = balls[i];
-      b.vy += GRAVITY;
+      b.vy = Math.min(b.vy + GRAVITY, 3);
       b.vx *= 0.995;
       b.x += b.vx;
       b.y += b.vy;
@@ -879,43 +872,22 @@
       if (b.x - b.r < 0){ b.x = b.r; b.vx = Math.abs(b.vx); }
       if (b.x + b.r > W){ b.x = W - b.r; b.vx = -Math.abs(b.vx); }
 
-      if (b.y + b.r > H){
-        b.y = H - b.r;
-        b.vy = -b.vy * DAMPING;
-        b.vx *= 0.92;
-        if (Math.abs(b.vy) < 1.2){
-          b.vy = 0;
-          b.restTime++;
-        }
-      } else {
-        b.restTime = 0;
-      }
-
-      // Balls that have rested on the floor for a while get recycled
-      // so the "rain" of balls stays fresh instead of piling up forever.
-      if (b.restTime > 240){
+      // Balls fall through and off the bottom, then get recycled at the
+      // top so the "rain" keeps flowing instead of piling up on a floor.
+      if (b.y - b.r > H){
         balls.splice(i, 1);
       }
     }
   }
 
+  var BG_COLOR = '#E85C1A';
+
   function draw(){
-    var g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#FFB347');
-    g.addColorStop(0.55, '#FF7A1A');
-    g.addColorStop(1, '#FF4D1C');
-    ctx.fillStyle = g;
+    ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, W, H);
 
     for (var i = 0; i < balls.length; i++){
       var b = balls[i];
-
-      var distFromFloor = clamp(H - (b.y + b.r), 0, 220);
-      var shadowScale = clamp(1 - distFromFloor / 220, 0.25, 1);
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(120,40,10,' + (0.28 * shadowScale).toFixed(3) + ')';
-      ctx.ellipse(b.x, H - 6, b.r * 0.9 * shadowScale, b.r * 0.28 * shadowScale, 0, 0, Math.PI * 2);
-      ctx.fill();
 
       var body = ctx.createRadialGradient(
         b.x - b.r * 0.35, b.y - b.r * 0.4, b.r * 0.1,
@@ -948,9 +920,14 @@
       var dx = b.x - x, dy = b.y - y;
       var d = Math.sqrt(dx * dx + dy * dy);
       if (d < b.r + 26){
-        b.vy = -rand(15, 20);
-        b.vx += dx * 0.06;
-        b.restTime = 0;
+        if (!b.hovering){
+          b.vy = -rand(4, 6);
+          b.vx += dx * 0.06;
+          b.restTime = 0;
+          b.hovering = true;
+        }
+      } else {
+        b.hovering = false;
       }
     }
   }
@@ -961,7 +938,17 @@
     bounceAt(e.clientX, e.clientY);
   });
 
+  document.addEventListener('mousemove', function(e){
+    bounceAt(e.clientX, e.clientY);
+  }, { passive: true });
+
   document.addEventListener('touchstart', function(e){
+    if (e.touches && e.touches[0]){
+      bounceAt(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e){
     if (e.touches && e.touches[0]){
       bounceAt(e.touches[0].clientX, e.touches[0].clientY);
     }
@@ -969,12 +956,7 @@
 
   resize();
   for (var i = 0; i < 6; i++) spawnBall();
-
-  if (reduceMotion){
-    draw();
-  } else {
-    requestAnimationFrame(loop);
-  }
+  requestAnimationFrame(loop);
 })();
 </script>
 
